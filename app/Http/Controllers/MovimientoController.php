@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Movimiento;
 use Illuminate\Http\Request;
+use App\Models\PresupuestoGeneral;
+
 
 class MovimientoController extends Controller
 {
@@ -28,7 +30,33 @@ class MovimientoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'categoria_id' => 'required|exists:categorias,id',
+            'tipo' => 'required|in:ingreso,gasto',
+            'monto' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'nullable|date',
+        ]);
+
+        $movimiento = Movimiento::create($validated);
+
+        $presupuesto = PresupuestoGeneral::where('user_id', $validated['user_id'])->first();
+
+        if ($presupuesto) {
+            if ($validated['tipo'] === 'ingreso') {
+                $presupuesto->saldo_actual += $validated['monto'];
+            } else {
+                $presupuesto->saldo_actual -= $validated['monto'];
+            }
+            $presupuesto->save();
+        }
+
+        return response()->json([
+            'ok' => true,
+            'movimiento' => $movimiento,
+            'nuevo_saldo' => $presupuesto ? $presupuesto->saldo_actual : null,
+        ], 201);
     }
 
     /**

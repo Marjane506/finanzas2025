@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\PresupuestoGeneral;
+
 
 class Movimiento extends Model
 {
@@ -15,7 +17,7 @@ class Movimiento extends Model
         'monto',
         'fecha',
         'descripcion',
-        'tipo',
+        'tipo', // ingreso o gasto
     ];
     public function user()
     {
@@ -25,5 +27,10 @@ class Movimiento extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
+    }
+
+    public function presupuesto()
+    {
+        return $this->belongsTo(PresupuestoGeneral::class, 'user_id', 'user_id');
     }
 }
