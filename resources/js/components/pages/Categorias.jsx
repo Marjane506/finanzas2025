@@ -1,112 +1,88 @@
-import React, { useEffect, useState } from "react";
-import api from "../api";
+import React from "react";
+import { PlusCircle, ChevronDown } from "lucide-react";
 
 export default function Categorias() {
-    const [categorias, setCategorias] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const presupuesto = 800;
+    const categorias = [
+        { id: 1, nombre: "Alimentación", tipo: "gasto", color: "#FF6B6B" },
+        { id: 2, nombre: "Transporte", tipo: "gasto", color: "#4ECDC4" },
+        { id: 3, nombre: "Vivienda", tipo: "gasto", color: "#FFD93D" },
+        { id: 4, nombre: "Salario", tipo: "ingreso", color: "#6BCB77" },
+        { id: 5, nombre: "Inversiones", tipo: "ingreso", color: "#4D96FF" },
+    ];
 
-    // Campos del formulario
-    const [nombre, setNombre] = useState("");
-    const [tipo, setTipo] = useState("gasto");
-    const [color, setColor] = useState("#cccccc");
-
-    // Cargar categorías al iniciar
-    useEffect(() => {
-        api.get("/categorias")
-            .then((res) => {
-                setCategorias(res.data);
-                setLoading(false);
-            })
-            .catch((err) => {
-                console.error("Error al obtener categorías:", err);
-                setError("No se pudieron cargar las categorías");
-                setLoading(false);
-            });
-    }, []);
-
-    // Crear nueva categoría
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        api.post("/categorias", { nombre, tipo, color })
-            .then((res) => {
-                setCategorias([...categorias, res.data.categoria]);
-                setNombre("");
-                setColor("#cccccc");
-            })
-            .catch((err) => {
-                console.error("Error al crear categoría:", err);
-                alert("Error al crear categoría");
-            });
-    };
-
-    if (loading) return <p className="p-4">Cargando...</p>;
-    if (error) return <p className="p-4 text-red-600">{error}</p>;
+    const fecha = new Date().toLocaleDateString("es-ES", {
+        month: "long",
+        year: "numeric",
+    });
+    const fechaCapitalizada = fecha.charAt(0).toUpperCase() + fecha.slice(1);
 
     return (
-        <div className="p-6 max-w-3xl mx-auto">
-            <h1 className="text-2xl font-bold mb-4">Categorías</h1>
+        <div className="max-w-8xl mx-auto p-8 min-h-screen">
+            <div className="flex items-center gap-2 mb-8">
+                <h1 className="text-3xl font-bold text-gray-800">
+                    {fechaCapitalizada}
+                </h1>
+                <button
+                    onClick={() =>
+                        alert("Ver historial de meses (próximamente...)")
+                    }
+                    className="text-gray-500 hover:text-indigo-600 transition"
+                >
+                    <ChevronDown className="w-6 h-6" />
+                </button>
+            </div>
 
-            {/* Formulario */}
-            <form
-                onSubmit={handleSubmit}
-                className="bg-white p-4 rounded-lg shadow mb-6"
-            >
-                <div className="flex flex-col md:flex-row gap-3">
-                    <input
-                        type="text"
-                        placeholder="Nombre"
-                        value={nombre}
-                        onChange={(e) => setNombre(e.target.value)}
-                        className="border rounded p-2 flex-1"
-                        required
-                    />
+            <div className="flex justify-end mb-6">
+                <button
+                    onClick={() => alert("Función próximamente...")}
+                    className="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-2"
+                >
+                    <PlusCircle size={20} />
+                    Nueva Categoría
+                </button>
+            </div>
 
-                    <select
-                        value={tipo}
-                        onChange={(e) => setTipo(e.target.value)}
-                        className="border rounded p-2"
-                    >
-                        <option value="gasto">Gasto</option>
-                        <option value="ingreso">Ingreso</option>
-                    </select>
-
-                    <input
-                        type="color"
-                        value={color}
-                        onChange={(e) => setColor(e.target.value)}
-                        className="border rounded p-1 w-16 h-10"
-                    />
-
-                    <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                    >
-                        Añadir
-                    </button>
-                </div>
-            </form>
-
-            {/* Lista */}
-            <ul className="divide-y divide-gray-200 bg-white rounded-xl shadow">
-                {categorias.map((cat) => (
-                    <li
-                        key={cat.id}
-                        className="p-4 flex justify-between items-center"
-                    >
-                        <span>
-                            <span className="font-medium">{cat.nombre}</span>{" "}
-                            <span className="text-gray-500 text-sm ml-2">
-                                ({cat.tipo})
-                            </span>
-                        </span>
-                        <span
-                            className="w-4 h-4 rounded-full"
-                            style={{ backgroundColor: cat.color }}
-                        ></span>
-                    </li>
-                ))}
-            </ul>
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+                <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-indigo-50 text-indigo-600 uppercase text-xs tracking-wider">
+                        <tr>
+                            <th className="px-6 py-3 text-left font-semibold">
+                                Nombre
+                            </th>
+                            <th className="px-6 py-3 text-left font-semibold">
+                                Tipo
+                            </th>
+                            <th className="px-6 py-3 text-center font-semibold">
+                                Color
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100 text-gray-700">
+                        {categorias.map((cat) => (
+                            <tr
+                                key={cat.id}
+                                className="hover:bg-indigo-50 transition duration-150"
+                            >
+                                <td className="px-6 py-4 font-medium">
+                                    {cat.nombre}
+                                </td>
+                                <td className="px-6 py-4 capitalize">
+                                    {cat.tipo === "gasto"
+                                        ? "💸 Gasto"
+                                        : "💰 Ingreso"}
+                                </td>
+                                <td className="px-6 py-4 text-center">
+                                    <span
+                                        className="inline-block w-5 h-5 rounded-full border border-gray-300 shadow-sm"
+                                        style={{ backgroundColor: cat.color }}
+                                    ></span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }

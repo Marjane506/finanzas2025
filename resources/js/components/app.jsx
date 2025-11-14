@@ -7,6 +7,7 @@ import Layout from "./layouts/Layout";
 import Presupuestos from "./pages/Presupuestos";
 import Dashboard from "./pages/Dashboard";
 import Categorias from "./pages/Categorias";
+import BudgetOverlay from "./pages/BudgetOverlay";
 
 function App() {
     return (
@@ -20,6 +21,11 @@ function App() {
                 </Route>
 
                 {/* Rutas protegidas / privadas */}
+
+                <Route
+                    path="/test-budget"
+                    element={<BudgetOverlay userId={1} />}
+                />
                 <Route path="/presupuestos" element={<Presupuestos />} />
 
                 <Route element={<Layout />}>

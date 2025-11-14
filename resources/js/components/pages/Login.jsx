@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import BudgetOverlay from "./BudgetOverlay";
 
 export default function Login() {
     const [form, setForm] = useState({ email: "", password: "" });
@@ -16,11 +17,17 @@ export default function Login() {
             const { data } = await axios.post("/api/login", form, {
                 withCredentials: true,
             });
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
+            setUser(data.user); // 👈 guarda usuario para overlay
             setMessage(`Bienvenido ${data.user.name}`);
         } catch (error) {
             setMessage("Error al iniciar sesión");
         }
     };
+
+    // 🔹 Si el usuario ya está logueado, muestra el overlay de presupuesto
+    if (user) return <BudgetOverlay userId={user.id} />;
 
     return (
         <>
